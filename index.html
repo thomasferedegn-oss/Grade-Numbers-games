@@ -1,0 +1,957 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Kingdom (1 - 20) | Interactive Audio Quiz</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Fredoka', 'Noto Sans Ethiopic', sans-serif;
+      background: radial-gradient(circle at top left, #fdfbfb, #ebedee), linear-gradient(135deg, #e0f2fe 0%, #fef3c7 50%, #fce7f3 100%);
+      min-height: 100vh;
+    }
+    .amharic-font {
+      font-family: 'Noto Sans Ethiopic', 'Fredoka', sans-serif;
+    }
+    .bounce-in {
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pulse-glow {
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased p-3 sm:p-6 flex flex-col justify-between">
+
+  <!-- Top Bar with Timer and Speaker Switch -->
+  <header class="max-w-4xl mx-auto w-full flex flex-wrap items-center justify-between gap-3 mb-4 bg-white/80 backdrop-blur-md px-5 py-3 rounded-2xl shadow-sm border border-amber-100">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-rose-400 flex items-center justify-center text-white text-xl shadow-sm">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-amber-600 to-rose-500 bg-clip-text text-transparent">
+          Number Kingdom 1–20
+        </h1>
+        <p class="text-xs text-slate-500">British Accent Voice • እንግሊዝኛ እና አማርኛ ማብራሪያ</p>
+      </div>
+    </div>
+
+    <!-- Required timer snippet -->
+    <div class="flex items-center space-x-4">
+      <button id="voiceTestBtn" onclick="speakText('Welcome to Number Kingdom! Let us learn numbers together.', true)" class="text-xs bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-volume-high text-amber-500"></i> British Voice Test
+      </button>
+      <div id="timer" style="text-align: right; font-weight: bold; color: #e74c3c; padding: 10px;">Time: 60m 00s</div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center">
+
+    <!-- Screen 1: Registration Screen -->
+    <div id="registerScreen" class="bg-white rounded-3xl shadow-xl border-4 border-amber-200 p-6 sm:p-10 bounce-in">
+      <div class="text-center max-w-xl mx-auto">
+        <div class="inline-block p-4 bg-amber-100 rounded-full text-amber-600 text-4xl mb-4">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-2">Student Identification</h2>
+        <p class="text-slate-600 text-sm sm:text-base mb-6">
+          Welcome young explorer! Please enter your details before taking the British Voice Number Adventure!
+          <span class="block text-xs text-slate-400 amharic-font mt-1">እባክዎ ከመጀመርዎ በፊት ሙሉ ስምዎን እና መለያ ቁጥርዎን ያስገቡ።</span>
+        </p>
+
+        <form id="startForm" onsubmit="event.preventDefault(); startQuiz();" class="space-y-4 text-left">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Full Name (ሙሉ ስም)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <input type="text" id="studentName" required placeholder="e.g. Samuel Alistair" 
+                class="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-2xl focus:border-amber-400 focus:outline-none text-slate-800 font-medium transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Student ID / Roll Number (የተማሪ መለያ ቁጥር)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-id-badge"></i>
+              </span>
+              <input type="text" id="studentId" required placeholder="e.g. STU-2026-88" 
+                class="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-2xl focus:border-amber-400 focus:outline-none text-slate-800 font-medium transition">
+            </div>
+          </div>
+
+          <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200 flex items-start space-x-3 text-xs text-amber-900">
+            <i class="fa-solid fa-circle-info text-amber-500 mt-0.5 text-base"></i>
+            <div>
+              <p class="font-bold">Instructions & Features:</p>
+              <ul class="list-disc list-inside space-y-0.5 mt-1 text-slate-600">
+                <li>Every question features an audio playback button with a clear British accent.</li>
+                <li>Instant visual feedback locks in irreversible answers and shows in-depth Amharic & English explanations.</li>
+                <li>Your final grade will be computed automatically and can be sent directly to teacher: <b>mesayferedegn2@gmail.com</b>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-4 mt-2 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Start Quiz Adventure (ጀምር)
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Screen 2: Interactive Quiz Screen -->
+    <div id="quizScreen" class="hidden bg-white rounded-3xl shadow-xl border-4 border-amber-200 p-5 sm:p-8 bounce-in">
+      
+      <!-- Progress Bar & Question Counter -->
+      <div class="flex items-center justify-between mb-3 text-xs sm:text-sm font-bold text-slate-500">
+        <span id="questionCounter">Question 1 of 20</span>
+        <span id="scoreDisplay" class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full">Score: 0 / 20</span>
+      </div>
+
+      <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-6">
+        <div id="quizProgressBar" class="h-full bg-gradient-to-r from-amber-400 to-rose-400 transition-all duration-300" style="width: 5%;"></div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-amber-50/60 border-2 border-amber-100 rounded-3xl p-5 sm:p-6 mb-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <span id="categoryBadge" class="bg-indigo-100 text-indigo-700 text-xs px-3 py-1 font-bold rounded-lg uppercase tracking-wide">
+            Sound & Spelling
+          </span>
+          <!-- British Narration Button -->
+          <button id="narratorBtn" onclick="narrateCurrentQuestion()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow flex items-center gap-2 active:scale-95 transition">
+            <i class="fa-solid fa-volume-high animate-pulse"></i>
+            <span>Listen (British Voice)</span>
+          </button>
+        </div>
+
+        <!-- Question Title -->
+        <h3 id="questionText" class="text-xl sm:text-2xl font-black text-slate-800 mb-2">
+          Loading question...
+        </h3>
+
+        <!-- Interactive Visual Cue / Emoji / Graphic -->
+        <div id="visualDisplay" class="my-4 py-4 px-6 bg-white rounded-2xl border border-amber-200 shadow-sm flex flex-wrap items-center justify-center gap-2 text-2xl sm:text-3xl min-h-[70px]">
+          🍎🍎🍎
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-500 italic">
+          Choose the correct matching option below. Answers are irreversible once selected!
+        </p>
+      </div>
+
+      <!-- Answer Options (Grid) -->
+      <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
+        <!-- Buttons injected dynamically -->
+      </div>
+
+      <!-- Instant Feedback & Detailed Bilingual Explanation Box -->
+      <div id="feedbackBox" class="hidden rounded-2xl p-4 sm:p-5 mb-6 border transition-all duration-300">
+        <div class="flex items-center gap-2 font-bold text-base sm:text-lg mb-2" id="feedbackTitle">
+          <!-- Injected via JS -->
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm pt-2 border-t border-slate-200">
+          <div class="bg-white/80 p-3 rounded-xl border border-slate-100 shadow-xs">
+            <span class="font-bold text-blue-700 block mb-1">
+              <i class="fa-solid fa-earth-americas"></i> English Explanation:
+            </span>
+            <p id="englishExplanation" class="text-slate-700 leading-relaxed"></p>
+          </div>
+          <div class="bg-white/80 p-3 rounded-xl border border-slate-100 shadow-xs amharic-font">
+            <span class="font-bold text-emerald-700 block mb-1">
+              <i class="fa-solid fa-language"></i> የአማርኛ ማብራሪያ (Amharic Explanation):
+            </span>
+            <p id="amharicExplanation" class="text-slate-800 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Navigation Controls (Back, Skip / Next, Submit) -->
+      <div class="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+        <button id="prevBtn" onclick="prevQuestion()" class="px-5 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2 text-sm sm:text-base">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+
+        <div class="flex gap-2">
+          <button id="skipBtn" onclick="skipQuestion()" class="px-4 py-2.5 rounded-xl border-2 border-amber-300 bg-amber-50 text-amber-800 font-bold hover:bg-amber-100 transition flex items-center gap-1.5 text-xs sm:text-sm">
+            <i class="fa-solid fa-forward-step"></i> Skip
+          </button>
+
+          <button id="nextBtn" onclick="nextQuestion()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow transition flex items-center gap-2 text-sm sm:text-base">
+            Next <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <button id="submitQuizBtn" onclick="finishQuiz()" class="hidden px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold shadow-md hover:shadow-lg transition flex items-center gap-2 text-sm sm:text-base">
+          <i class="fa-solid fa-flag-checkered"></i> Submit Quiz
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Screen 3: Teacher Dashboard / Results Screen -->
+    <div id="resultScreen" class="hidden bg-white rounded-3xl shadow-xl border-4 border-emerald-200 p-6 sm:p-10 bounce-in">
+      <div class="text-center max-w-2xl mx-auto">
+        <div id="trophyIcon" class="inline-block p-5 bg-emerald-100 text-emerald-600 rounded-full text-5xl mb-3 shadow-inner">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-3xl font-black text-slate-800">Quiz Completed!</h2>
+        <p class="text-slate-500 text-sm mb-6">Here is your official performance evaluation card & summary dashboard.</p>
+
+        <!-- Student summary scorecard -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6 text-left">
+          <div class="p-2">
+            <span class="text-xs text-slate-400 block font-semibold">Student Name:</span>
+            <span id="resStudentName" class="font-bold text-slate-800 truncate block"></span>
+          </div>
+          <div class="p-2">
+            <span class="text-xs text-slate-400 block font-semibold">Student ID:</span>
+            <span id="resStudentId" class="font-bold text-slate-800 block"></span>
+          </div>
+          <div class="p-2">
+            <span class="text-xs text-slate-400 block font-semibold">Final Score:</span>
+            <span id="resScore" class="font-extrabold text-emerald-600 text-lg block"></span>
+          </div>
+          <div class="p-2">
+            <span class="text-xs text-slate-400 block font-semibold">Time Spent:</span>
+            <span id="resTimeSpent" class="font-bold text-amber-600 block"></span>
+          </div>
+        </div>
+
+        <!-- Grade Banner -->
+        <div id="gradeBadge" class="py-3 px-6 rounded-2xl font-black text-lg mb-6 shadow-sm inline-block">
+          Grade: Outstanding (A)
+        </div>
+
+        <!-- Teacher Notification System & Email Submission -->
+        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-6 text-left">
+          <h4 class="font-bold text-indigo-950 flex items-center gap-2 mb-1 text-base">
+            <i class="fa-solid fa-envelope-circle-check text-indigo-600 text-lg"></i>
+            Teacher Notification / Submission System
+          </h4>
+          <p class="text-xs sm:text-sm text-indigo-800 mb-3">
+            Click below to instantly prepare and send this official grade report directly to the teacher email:
+            <span class="font-bold underline text-indigo-900">mesayferedegn2@gmail.com</span>.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <a id="emailReportBtn" href="#" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm flex items-center gap-2 shadow transition">
+              <i class="fa-solid fa-paper-plane"></i> Send Results to Teacher via Email
+            </a>
+            <button onclick="copyResultsClipboard()" class="px-4 py-2.5 bg-white border border-indigo-300 hover:bg-indigo-100 text-indigo-900 rounded-xl font-bold text-sm flex items-center gap-2 transition">
+              <i class="fa-solid fa-copy"></i> Copy Summary
+            </button>
+          </div>
+          <p id="copyStatus" class="text-xs text-emerald-600 font-bold mt-2 hidden">
+            ✓ Report copied to clipboard!
+          </p>
+        </div>
+
+        <!-- Detailed Review list of all 20 questions -->
+        <div class="text-left mt-6">
+          <h4 class="font-bold text-slate-800 mb-3 text-base flex items-center justify-between">
+            <span>Detailed Question Audit:</span>
+            <span class="text-xs font-normal text-slate-500">20 comprehensive number checks</span>
+          </h4>
+          <div id="detailedAuditList" class="space-y-2 max-h-64 overflow-y-auto p-2 border border-slate-200 rounded-2xl bg-slate-50/50">
+            <!-- Questions dynamically reviewed here -->
+          </div>
+        </div>
+
+        <!-- Restart Button -->
+        <button onclick="restartQuiz()" class="mt-6 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl transition">
+          <i class="fa-solid fa-rotate-right mr-2"></i> Retake Test / New Student
+        </button>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Sticky audio indicator -->
+  <footer class="max-w-4xl mx-auto w-full text-center text-xs text-slate-400 py-2">
+    Number Learning Academy • Designed with High-Fidelity British Narration & Bilingual Pedagogy
+  </footer>
+
+  <!-- Quiz & Sound Engine Script -->
+  <script>
+    // -------------------------------------------------------------
+    // 1. Comprehensive Question Bank: Numbers 1 to 20
+    // Covers numbers, audio sounds, spelling, counting and patterns
+    // -------------------------------------------------------------
+    const questions = [
+      {
+        id: 1,
+        number: 1,
+        text: "What is the correct English spelling of the number 1?",
+        visual: "🍎",
+        voicePrompt: "Number 1. O N E. One apple.",
+        options: ["Won", "One", "Onne", "Own"],
+        correctIndex: 1,
+        explanationEn: "The number 1 is spelt 'O-N-E'. It represents a single isolated unit.",
+        explanationAm: "ቁጥር 1 በእንግሊዝኛ 'O-N-E' ተብሎ ይጻፋል እና 'ዋን' ተብሎ ይነበባል:: ትርጉሙም አንድ (1) ማለት ነው።"
+      },
+      {
+        id: 2,
+        number: 2,
+        text: "Listen and match: Which word spells the number 2?",
+        visual: "⭐ ⭐",
+        voicePrompt: "Number 2. T W O. Two sparkling stars.",
+        options: ["To", "Too", "Two", "Tow"],
+        correctIndex: 2,
+        explanationEn: "The number 2 is spelt 'T-W-O'. Do not confuse it with 'to' (direction) or 'too' (also).",
+        explanationAm: "ቁጥር 2 በእንግሊዝኛ 'T-W-O' ተብሎ ይጻፋል:: 'ቱ' ተብሎ ይነበባል:: ትርጉሙ ሁለት (2) ማለት ነው።"
+      },
+      {
+        id: 3,
+        number: 3,
+        text: "How many butterflies do you see? Spell the quantity.",
+        visual: "🦋 🦋 🦋",
+        voicePrompt: "Number 3. T H R E E. Three little butterflies.",
+        options: ["Three", "Tree", "Free", "Thre"],
+        correctIndex: 0,
+        explanationEn: "Three is spelled 'T-H-R-E-E'. Make sure to pronounce the soft 'th' sound.",
+        explanationAm: "ቁጥር 3 በእንግሊዝኛ 'T-H-R-E-E' ('ስሪ') ተብሎ ይጻፋል:: ትርጉሙ ሶስት (3) ማለት ነው።"
+      },
+      {
+        id: 4,
+        number: 4,
+        text: "Identify the number four among the options below:",
+        visual: "🚗 🚗 🚗 🚗",
+        voicePrompt: "Number 4. F O U R. Four cars.",
+        options: ["For", "Four", "Fore", "Fuor"],
+        correctIndex: 1,
+        explanationEn: "The number 4 is spelt 'F-O-U-R'. 'For' is a preposition, and 'fore' means in front.",
+        explanationAm: "ቁጥር 4 በእንግሊዝኛ 'F-O-U-R' ('ፎር') ተብሎ ይጻፋል። ትርጉሙ አራት (4) ማለት ነው።"
+      },
+      {
+        id: 5,
+        number: 5,
+        text: "Count the friendly lions. Which spelling matches 5?",
+        visual: "🦁 🦁 🦁 🦁 🦁",
+        voicePrompt: "Number 5. F I V E. Five brave lions.",
+        options: ["Fivve", "Faiv", "Five", "Fif"],
+        correctIndex: 2,
+        explanationEn: "5 is spelled 'F-I-V-E'. The silent 'e' at the end makes the 'i' say its long vowel sound.",
+        explanationAm: "ቁጥር 5 በእንግሊዝኛ 'F-I-V-E' ('ፋይቭ') ተብሎ ይጻፋል። ትርጉሙ አምስት (5) ማለት ነው።"
+      },
+      {
+        id: 6,
+        number: 6,
+        text: "Which number word spells the number 6?",
+        visual: "🎈 🎈 🎈 🎈 🎈 🎈",
+        voicePrompt: "Number 6. S I X. Six floating balloons.",
+        options: ["Six", "Sex", "Siks", "Sixx"],
+        correctIndex: 0,
+        explanationEn: "The number 6 is spelled 'S-I-X'. It has three letters with a sharp 'ks' sound at the end.",
+        explanationAm: "ቁጥር 6 በእንግሊዝኛ 'S-I-X' ('ሲክስ') ተብሎ ይጻፋል:: ትርጉሙ ስድስት (6) ማለት ነው።"
+      },
+      {
+        id: 7,
+        number: 7,
+        text: "What is the spelling of the lucky number 7?",
+        visual: "🌈 🌈 🌈 🌈 🌈 🌈 🌈",
+        voicePrompt: "Number 7. S E V E N. Seven rainbows.",
+        options: ["Sevan", "Seven", "Sevven", "Saven"],
+        correctIndex: 1,
+        explanationEn: "The numeral 7 is spelled 'S-E-V-E-N'. It consists of two syllables: sev-en.",
+        explanationAm: "ቁጥር 7 በእንግሊዝኛ 'S-E-V-E-N' ('ሰቨን') ተብሎ ይጻፋል። ትርጉሙ ሰባት (7) ማለት ነው።"
+      },
+      {
+        id: 8,
+        number: 8,
+        text: "Listen carefully: What is the correct spelling of 8?",
+        visual: "⚽ ⚽ ⚽ ⚽ ⚽ ⚽ ⚽ ⚽",
+        voicePrompt: "Number 8. E I G H T. Eight footballs.",
+        options: ["Ate", "Eigt", "Eight", "Eeight"],
+        correctIndex: 2,
+        explanationEn: "8 is spelled 'E-I-G-H-T'. The letters 'gh' are silent in this word.",
+        explanationAm: "ቁጥር 8 በእንግሊዝኛ 'E-I-G-H-T' ('ኤይት') ተብሎ ይጻፋል:: 'gh' ድምፅ አይሰጡም:: ትርጉሙ ስምንት (8) ነው።"
+      },
+      {
+        id: 9,
+        number: 9,
+        text: "Find the correct spelling for 9:",
+        visual: "🧁 🧁 🧁 🧁 🧁 🧁 🧁 🧁 🧁",
+        voicePrompt: "Number 9. N I N E. Nine sweet cupcakes.",
+        options: ["Nine", "Nin", "Nayn", "Nyne"],
+        correctIndex: 0,
+        explanationEn: "The number 9 is written as 'N-I-N-E'. Don't drop the 'e' at the end.",
+        explanationAm: "ቁጥር 9 በእንግሊዝኛ 'N-I-N-E' ('ናይን') ተብሎ ይጻፋል:: ትርጉሙ ዘጠኝ (9) ማለት ነው።"
+      },
+      {
+        id: 10,
+        number: 10,
+        text: "Ten fingers on your two hands! How do we spell 10?",
+        visual: "🖐️ 🖐️",
+        voicePrompt: "Number 10. T E N. Ten fingers.",
+        options: ["Tan", "Tin", "Ten", "Tenn"],
+        correctIndex: 2,
+        explanationEn: "The number 10 is spelled 'T-E-N'. It completes the single digits base 10 system.",
+        explanationAm: "ቁጥር 10 በእንግሊዝኛ 'T-E-N' ('ቴን') ተብሎ ይጻፋል። ትርጉሙ አስር (10) ማለት ነው።"
+      },
+      {
+        id: 11,
+        number: 11,
+        text: "What comes immediately after 10? Choose the spelling for 11.",
+        visual: "🔔 🔔 🔔 🔔 🔔 🔔 🔔 🔔 🔔 🔔 🔔",
+        voicePrompt: "Number 11. E L E V E N. Eleven bells ringing.",
+        options: ["Eleaven", "Eleven", "Elevn", "Elven"],
+        correctIndex: 1,
+        explanationEn: "The number 11 is spelled 'E-L-E-V-E-N'. It is the first number after 10.",
+        explanationAm: "ቁጥር 11 በእንግሊዝኛ 'E-L-E-V-E-N' ('ኢሌቨን') ተብሎ ይጻፋል:: ትርጉሙ አስራ አንድ (11) ማለት ነው።"
+      },
+      {
+        id: 12,
+        number: 12,
+        text: "A dozen means 12. Which is the right spelling?",
+        visual: "🍩 x 12 (One Dozen)",
+        voicePrompt: "Number 12. T W E L V E. Twelve tasty donuts.",
+        options: ["Twelve", "Twelv", "Twelf", "Twleve"],
+        correctIndex: 0,
+        explanationEn: "12 is written as 'T-W-E-L-V-E'. Notice the 've' at the end.",
+        explanationAm: "ቁጥር 12 በእንግሊዝኛ 'T-W-E-L-V-E' ('ትዌልቭ') ተብሎ ይጻፋል። ትርጉሙ አስራ ሁለት (12) ማለት ነው።"
+      },
+      {
+        id: 13,
+        number: 13,
+        text: "Which word represents the teen number 13?",
+        visual: "10 + 3 = 13 🚀",
+        voicePrompt: "Number 13. T H I R T E E N. Thirteen rockets in the sky.",
+        options: ["Threeteen", "Thirteen", "Therteen", "Thirtin"],
+        correctIndex: 1,
+        explanationEn: "13 is spelled 'T-H-I-R-T-E-E-N'. We do not say 'threeteen'; we say 'thirteen'.",
+        explanationAm: "ቁጥር 13 በእንግሊዝኛ 'T-H-I-R-T-E-E-N' ('ተርቲን') ተብሎ ይጻፋል:: ትርጉሙ አስራ ሶስት (13) ነው።"
+      },
+      {
+        id: 14,
+        number: 14,
+        text: "Spell the number that is 10 plus 4 (14):",
+        visual: "10 + 4 = 14 🐱",
+        voicePrompt: "Number 14. F O U R T E E N. Fourteen playful kittens.",
+        options: ["Fourteen", "Forteen", "Fortin", "Fourten"],
+        correctIndex: 0,
+        explanationEn: "14 retains the 'u': it is spelled 'F-O-U-R-T-E-E-N' (unlike forty which has no 'u').",
+        explanationAm: "ቁጥር 14 በእንግሊዝኛ 'F-O-U-R-T-E-E-N' ('ፎርቲን') ተብሎ ይጻፋል። ትርጉሙ አስራ አራት (14) ነው።"
+      },
+      {
+        id: 15,
+        number: 15,
+        text: "What is the proper spelling for 15?",
+        visual: "10 + 5 = 15 🐶",
+        voicePrompt: "Number 15. F I F T E E N. Fifteen happy puppies.",
+        options: ["Fiveteen", "Fifteen", "Fiftin", "Fivtin"],
+        correctIndex: 1,
+        explanationEn: "15 is spelled 'F-I-F-T-E-E-N'. The root turns from 'five' into 'fif-'.",
+        explanationAm: "ቁጥር 15 በእንግሊዝኛ 'F-I-F-T-E-E-N' ('ፊፍቲን') ተብሎ ይጻፋል:: 'ፋይቭቲን' አይባልም:: ትርጉሙ አስራ አምስት (15) ነው።"
+      },
+      {
+        id: 16,
+        number: 16,
+        text: "Choose the correct spelling for 16:",
+        visual: "10 + 6 = 16 🎨",
+        voicePrompt: "Number 16. S I X T E E N. Sixteen paint brushes.",
+        options: ["Sixteen", "Sixten", "Siksteen", "Sexteen"],
+        correctIndex: 0,
+        explanationEn: "16 is spelled 'S-I-X-T-E-E-N'. Combine 'six' with 'teen'.",
+        explanationAm: "ቁጥር 16 በእንግሊዝኛ 'S-I-X-T-E-E-N' ('ሲክስቲን') ተብሎ ይጻፋል። ትርጉሙ አስራ ስድስት (16) ማለት ነው።"
+      },
+      {
+        id: 17,
+        number: 17,
+        text: "Listen and spell: What is the number 17?",
+        visual: "10 + 7 = 17 🌟",
+        voicePrompt: "Number 17. S E V E N T E E N. Seventeen bright stars.",
+        options: ["Seventin", "Seventeen", "Seventen", "Sevventeen"],
+        correctIndex: 1,
+        explanationEn: "17 is spelled 'S-E-V-E-N-T-E-E-N'. Combine 'seven' and 'teen'.",
+        explanationAm: "ቁጥር 17 በእንግሊዝኛ 'S-E-V-E-N-T-E-E-N' ('ሰቨንቲን') ተብሎ ይጻፋል:: ትርጉሙ አስራ ሰባት (17) ነው።"
+      },
+      {
+        id: 18,
+        number: 18,
+        text: "How do you spell 18? Pay attention to the letters 't'!",
+        visual: "10 + 8 = 18 🎵",
+        voicePrompt: "Number 18. E I G H T E E N. Eighteen musical notes.",
+        options: ["Eightteen", "Eighten", "Eighteen", "Eitin"],
+        correctIndex: 2,
+        explanationEn: "18 is spelled 'E-I-G-H-T-E-E-N' with only ONE 't', sharing the 't' of eight and teen.",
+        explanationAm: "ቁጥር 18 በእንግሊዝኛ 'E-I-G-H-T-E-E-N' ('ኤይቲን') ተብሎ ይጻፋል:: አንድ 't' ፊደል ብቻ ነው ያለው:: ትርጉሙ አስራ ስምንት (18) ነው።"
+      },
+      {
+        id: 19,
+        number: 19,
+        text: "Which one is the correct spelling for 19?",
+        visual: "10 + 9 = 19 🍓",
+        voicePrompt: "Number 19. N I N E T E E N. Nineteen sweet strawberries.",
+        options: ["Nineteen", "Nineten", "Ninteen", "Nynten"],
+        correctIndex: 0,
+        explanationEn: "19 is spelled 'N-I-N-E-T-E-E-N'. It keeps the letter 'e' from 'nine'.",
+        explanationAm: "ቁጥር 19 በእንግሊዝኛ 'N-I-N-E-T-E-E-N' ('ናይንቲን') ተብሎ ይጻፋል። ትርጉሙ አስራ ዘጠኝ (19) ማለት ነው።"
+      },
+      {
+        id: 20,
+        number: 20,
+        text: "Final milestone! How do we spell the number 20?",
+        visual: "🌟 20 (Two Full Tens) 🌟",
+        voicePrompt: "Number 20. T W E N T Y. Twenty cheers for your hard work!",
+        options: ["Twenteen", "Twentee", "Twenty", "Tweny"],
+        correctIndex: 2,
+        explanationEn: "20 is spelled 'T-W-E-N-T-Y'. It ends with '-ty' which marks decade numbers in English.",
+        explanationAm: "ቁጥር 20 በእንግሊዝኛ 'T-W-E-N-T-Y' ('ትዌንቲ') ተብሎ ይጻፋል። ትርጉሙ ሃያ (20) ማለት ነው።"
+      }
+    ];
+
+    // -------------------------------------------------------------
+    // 2. Application State Variables
+    // -------------------------------------------------------------
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = new Array(questions.length).fill(null); // stores { selectedOptionIndex, isCorrect }
+    let studentDetails = { name: "", id: "" };
+    let timerInterval = null;
+    let totalSecondsLeft = 60 * 60; // 60 minutes requested
+    let timerStarted = false;
+
+    // -------------------------------------------------------------
+    // 3. Speech Synthesis: British Accent & Warm Voice Engine
+    // -------------------------------------------------------------
+    let britishVoice = null;
+
+    function initVoices() {
+      if ('speechSynthesis' in window) {
+        const load = () => {
+          const voices = window.speechSynthesis.getVoices();
+          // Priority 1: British English Female / Golden tone (en-GB)
+          britishVoice = voices.find(v => v.lang.includes('en-GB') && (v.name.includes('Female') || v.name.includes('Victoria') || v.name.includes('Libby') || v.name.includes('Sonia') || v.name.includes('Hazel') || v.name.includes('George') || v.name.includes('UK'))) 
+                      || voices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB'))
+                      || voices.find(v => v.lang.startsWith('en'))
+                      || null;
+        };
+        load();
+        window.speechSynthesis.onvoiceschanged = load;
+      }
+    }
+    initVoices();
+
+    function speakText(text, isAnnouncement = false) {
+      if (!('speechSynthesis' in window)) {
+        return;
+      }
+      window.speechSynthesis.cancel(); // Stop any pending speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (britishVoice) {
+        utterance.voice = britishVoice;
+        utterance.lang = britishVoice.lang;
+      } else {
+        utterance.lang = 'en-GB';
+      }
+      // Gentle, clear, soothing cadence for children
+      utterance.pitch = 1.05; 
+      utterance.rate = 0.88; 
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function narrateCurrentQuestion() {
+      const q = questions[currentQuestionIndex];
+      const prompt = `${q.voicePrompt} Question: ${q.text}`;
+      speakText(prompt);
+    }
+
+    // -------------------------------------------------------------
+    // 4. Timer Logic
+    // -------------------------------------------------------------
+    function startTimer() {
+      if (timerStarted) return;
+      timerStarted = true;
+      const timerEl = document.getElementById("timer");
+
+      timerInterval = setInterval(() => {
+        if (totalSecondsLeft <= 0) {
+          clearInterval(timerInterval);
+          timerEl.innerText = "Time: 00m 00s (Time's Up!)";
+          finishQuiz();
+          return;
+        }
+        totalSecondsLeft--;
+        const m = Math.floor(totalSecondsLeft / 60);
+        const s = totalSecondsLeft % 60;
+        timerEl.innerText = `Time: ${m}m ${s < 10 ? '0' : ''}${s}s`;
+      }, 1000);
+    }
+
+    // -------------------------------------------------------------
+    // 5. Quiz Navigation & Engine
+    // -------------------------------------------------------------
+    function startQuiz() {
+      const nameInput = document.getElementById("studentName").value.trim();
+      const idInput = document.getElementById("studentId").value.trim();
+
+      if (!nameInput || !idInput) return;
+
+      studentDetails.name = nameInput;
+      studentDetails.id = idInput;
+
+      document.getElementById("registerScreen").classList.add("hidden");
+      document.getElementById("quizScreen").classList.remove("hidden");
+
+      startTimer();
+      renderQuestion();
+      
+      // British greeting upon entry
+      setTimeout(() => {
+        speakText(`Hello ${studentDetails.name}! Let us begin number one. Listen to each sound carefully.`);
+      }, 300);
+    }
+
+    function renderQuestion() {
+      const q = questions[currentQuestionIndex];
+
+      // Update counters & progress
+      document.getElementById("questionCounter").innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+      document.getElementById("scoreDisplay").innerText = `Score: ${score} / ${questions.length}`;
+      const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+      document.getElementById("quizProgressBar").style.width = `${progressPercent}%`;
+
+      // Set category badge & texts
+      document.getElementById("categoryBadge").innerText = `Number ${q.number} • Phonetics & Spelling`;
+      document.getElementById("questionText").innerText = `${currentQuestionIndex + 1}. ${q.text}`;
+      document.getElementById("visualDisplay").innerHTML = q.visual;
+
+      // Render options
+      const container = document.getElementById("optionsContainer");
+      container.innerHTML = "";
+
+      const answered = userAnswers[currentQuestionIndex] !== null;
+
+      q.options.forEach((optText, index) => {
+        const btn = document.createElement("button");
+        btn.className = "text-left p-4 rounded-2xl border-2 font-bold text-base transition duration-150 flex items-center justify-between shadow-xs";
+
+        // If not answered yet
+        if (!answered) {
+          btn.className += " border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/50 text-slate-800 active:scale-98 cursor-pointer";
+          btn.innerHTML = `
+            <span class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-black">${String.fromCharCode(65 + index)}</span>
+              <span>${optText}</span>
+            </span>
+            <i class="fa-regular fa-circle text-slate-300"></i>
+          `;
+          btn.onclick = () => selectAnswer(index);
+        } else {
+          // Locked in state
+          btn.disabled = true;
+          const userChoice = userAnswers[currentQuestionIndex].selectedOptionIndex;
+          const isCorrectChoice = index === q.correctIndex;
+          const isUserChoice = index === userChoice;
+
+          if (isCorrectChoice) {
+            btn.className += " border-emerald-500 bg-emerald-50 text-emerald-900 font-extrabold ring-2 ring-emerald-400";
+            btn.innerHTML = `
+              <span class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm font-black"><i class="fa-solid fa-check"></i></span>
+                <span>${optText}</span>
+              </span>
+              <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-1 rounded-md uppercase font-bold">Correct Answer</span>
+            `;
+          } else if (isUserChoice && !isCorrectChoice) {
+            btn.className += " border-rose-500 bg-rose-50 text-rose-900 line-through opacity-90 ring-2 ring-rose-400";
+            btn.innerHTML = `
+              <span class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center text-sm font-black"><i class="fa-solid fa-xmark"></i></span>
+                <span>${optText}</span>
+              </span>
+              <span class="text-xs bg-rose-200 text-rose-900 px-2 py-1 rounded-md uppercase font-bold">Your Choice</span>
+            `;
+          } else {
+            btn.className += " border-slate-200 bg-slate-50 text-slate-400 opacity-60";
+            btn.innerHTML = `
+              <span class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-black">${String.fromCharCode(65 + index)}</span>
+                <span>${optText}</span>
+              </span>
+            `;
+          }
+        }
+        container.appendChild(btn);
+      });
+
+      // Feedback & Explanation Box Visibility
+      const feedbackBox = document.getElementById("feedbackBox");
+      if (answered) {
+        feedbackBox.classList.remove("hidden");
+        const isRight = userAnswers[currentQuestionIndex].isCorrect;
+        const feedbackTitle = document.getElementById("feedbackTitle");
+
+        if (isRight) {
+          feedbackBox.className = "rounded-2xl p-5 mb-6 border border-emerald-300 bg-emerald-50 text-emerald-900 bounce-in";
+          feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> <span>Spot on! Brilliant work! (ትክክል ነው!)</span>`;
+        } else {
+          feedbackBox.className = "rounded-2xl p-5 mb-6 border border-rose-300 bg-rose-50 text-rose-900 bounce-in";
+          feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> <span>Incorrect. Check the correct answer highlighted above! (ተሳስቷል!)</span>`;
+        }
+
+        document.getElementById("englishExplanation").innerText = q.explanationEn;
+        document.getElementById("amharicExplanation").innerText = q.explanationAm;
+      } else {
+        feedbackBox.classList.add("hidden");
+      }
+
+      // Back button visibility
+      document.getElementById("prevBtn").disabled = currentQuestionIndex === 0;
+
+      // Handle Skip / Next / Submit button visibility
+      const nextBtn = document.getElementById("nextBtn");
+      const submitBtn = document.getElementById("submitQuizBtn");
+      const skipBtn = document.getElementById("skipBtn");
+
+      if (currentQuestionIndex === questions.length - 1) {
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.remove("hidden");
+        skipBtn.classList.add("hidden");
+      } else {
+        nextBtn.classList.remove("hidden");
+        submitBtn.classList.add("hidden");
+        skipBtn.classList.remove("hidden");
+      }
+
+      // Auto-narrate slightly after question changes to assist early learners
+      narrateCurrentQuestion();
+    }
+
+    // -------------------------------------------------------------
+    // 6. Answer Selection (Instant Feedback & Irreversible Answer)
+    // -------------------------------------------------------------
+    function selectAnswer(selectedIndex) {
+      if (userAnswers[currentQuestionIndex] !== null) return; // Irreversible lock
+
+      const q = questions[currentQuestionIndex];
+      const isCorrect = (selectedIndex === q.correctIndex);
+
+      if (isCorrect) {
+        score++;
+        speakText(`Splendid! That is correct. ${q.options[selectedIndex]}`);
+      } else {
+        speakText(`Good try, but the right answer is ${q.options[q.correctIndex]}.`);
+      }
+
+      userAnswers[currentQuestionIndex] = {
+        selectedOptionIndex: selectedIndex,
+        isCorrect: isCorrect
+      };
+
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    function skipQuestion() {
+      // If student skips without answering, record as skipped (null)
+      if (userAnswers[currentQuestionIndex] === null) {
+        userAnswers[currentQuestionIndex] = {
+          selectedOptionIndex: -1,
+          isCorrect: false
+        };
+      }
+      nextQuestion();
+    }
+
+    // -------------------------------------------------------------
+    // 7. Finish Quiz & Teacher Notification Dashboard
+    // -------------------------------------------------------------
+    function finishQuiz() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      // Auto-grade unattempted questions as incorrect
+      for (let i = 0; i < questions.length; i++) {
+        if (userAnswers[i] === null) {
+          userAnswers[i] = { selectedOptionIndex: -1, isCorrect: false };
+        }
+      }
+
+      // Hide Quiz, Show Results
+      document.getElementById("quizScreen").classList.add("hidden");
+      document.getElementById("resultScreen").classList.remove("hidden");
+
+      // Calculate time taken
+      const secondsSpent = (60 * 60) - totalSecondsLeft;
+      const mins = Math.floor(secondsSpent / 60);
+      const secs = secondsSpent % 60;
+      const formattedTimeSpent = `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+
+      // Calculate percentage and letter grade
+      const percentage = Math.round((score / questions.length) * 100);
+      let grade = "C";
+      let gradeClass = "bg-amber-100 text-amber-900 border border-amber-300";
+      let voiceSummary = "";
+
+      if (percentage >= 90) {
+        grade = "Outstanding (A+)";
+        gradeClass = "bg-emerald-100 text-emerald-900 border border-emerald-300";
+        voiceSummary = "Stupendous achievement! You got a top grade of A plus.";
+      } else if (percentage >= 75) {
+        grade = "Very Good (A)";
+        gradeClass = "bg-teal-100 text-teal-900 border border-teal-300";
+        voiceSummary = "Well done! You scored an A.";
+      } else if (percentage >= 50) {
+        grade = "Good Effort (B)";
+        gradeClass = "bg-blue-100 text-blue-900 border border-blue-300";
+        voiceSummary = "Good job! You passed with a grade B.";
+      } else {
+        grade = "Needs Practice (C)";
+        gradeClass = "bg-rose-100 text-rose-900 border border-rose-300";
+        voiceSummary = "Keep practicing numbers one to twenty and try again soon!";
+      }
+
+      // Populate dashboard
+      document.getElementById("resStudentName").innerText = studentDetails.name;
+      document.getElementById("resStudentId").innerText = studentDetails.id;
+      document.getElementById("resScore").innerText = `${score} / ${questions.length} (${percentage}%)`;
+      document.getElementById("resTimeSpent").innerText = formattedTimeSpent;
+      
+      const badge = document.getElementById("gradeBadge");
+      badge.className = `py-3 px-6 rounded-2xl font-black text-lg mb-6 shadow-sm inline-block ${gradeClass}`;
+      badge.innerText = `Final Grade: ${grade}`;
+
+      // Build Teacher Email Link
+      const teacherEmail = "mesayferedegn2@gmail.com";
+      const emailSubject = encodeURIComponent(`Quiz Results: ${studentDetails.name} [ID: ${studentDetails.id}] - Numbers 1 to 20`);
+      
+      let breakdownText = "";
+      questions.forEach((q, idx) => {
+        const ans = userAnswers[idx];
+        const status = ans.isCorrect ? "CORRECT" : (ans.selectedOptionIndex === -1 ? "SKIPPED" : "WRONG");
+        const userChoice = ans.selectedOptionIndex >= 0 ? q.options[ans.selectedOptionIndex] : "None";
+        breakdownText += `Q${idx + 1} (Number ${q.number}): ${status} | Choice: ${userChoice} | Correct: ${q.options[q.correctIndex]}\n`;
+      });
+
+      const emailBody = encodeURIComponent(
+        `Dear Teacher Mesay Feredegn,\n\n` +
+        `Here is the automated quiz report for Numbers 1 - 20:\n\n` +
+        `-----------------------------------------\n` +
+        `STUDENT PERFORMANCE REPORT\n` +
+        `-----------------------------------------\n` +
+        `Full Name: ${studentDetails.name}\n` +
+        `Student ID: ${studentDetails.id}\n` +
+        `Score: ${score} / ${questions.length} (${percentage}%)\n` +
+        `Grade: ${grade}\n` +
+        `Time Spent: ${formattedTimeSpent}\n` +
+        `Submission Date: ${new Date().toLocaleString()}\n\n` +
+        `DETAILED RESPONSES:\n` +
+        breakdownText +
+        `\nKind regards,\n${studentDetails.name}`
+      );
+
+      const mailtoLink = `mailto:${teacherEmail}?subject=${emailSubject}&body=${emailBody}`;
+      document.getElementById("emailReportBtn").setAttribute("href", mailtoLink);
+
+      // Populate Detailed Audit list in UI
+      const auditContainer = document.getElementById("detailedAuditList");
+      auditContainer.innerHTML = "";
+
+      questions.forEach((q, idx) => {
+        const ans = userAnswers[idx];
+        const isRight = ans.isCorrect;
+        const row = document.createElement("div");
+        row.className = `p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 ${
+          isRight ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-rose-50/70 border-rose-200 text-rose-950'
+        }`;
+
+        const choiceLabel = ans.selectedOptionIndex >= 0 ? q.options[ans.selectedOptionIndex] : "Skipped";
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-white ${isRight ? 'bg-emerald-500' : 'bg-rose-500'}">
+              ${isRight ? '✓' : '✕'}
+            </span>
+            <span class="font-bold">Q${idx + 1} (No. ${q.number}):</span>
+            <span class="text-slate-600">${q.text}</span>
+          </div>
+          <div class="font-semibold text-right sm:text-left">
+            <span>Your Choice: <b class="${isRight ? 'text-emerald-700' : 'text-rose-700'}">${choiceLabel}</b></span>
+            ${!isRight ? `<span class="block sm:inline sm:ml-2 text-slate-500 font-normal">(Correct: <b>${q.options[q.correctIndex]}</b>)</span>` : ''}
+          </div>
+        `;
+        auditContainer.appendChild(row);
+      });
+
+      // Voice readout for results
+      speakText(`Congratulations ${studentDetails.name}! You scored ${score} out of 20. ${voiceSummary}`);
+    }
+
+    // -------------------------------------------------------------
+    // 8. Clipboard Copy Functionality
+    // -------------------------------------------------------------
+    function copyResultsClipboard() {
+      const percentage = Math.round((score / questions.length) * 100);
+      const textToCopy = `Student Quiz Report:
+Name: ${studentDetails.name}
+ID: ${studentDetails.id}
+Score: ${score}/20 (${percentage}%)
+Teacher: mesayferedegn2@gmail.com
+Status: Completed`;
+
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = textToCopy;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+
+      const statusEl = document.getElementById("copyStatus");
+      statusEl.classList.remove("hidden");
+      setTimeout(() => statusEl.classList.add("hidden"), 3500);
+    }
+
+    // -------------------------------------------------------------
+    // 9. Retake Quiz
+    // -------------------------------------------------------------
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      userAnswers = new Array(questions.length).fill(null);
+      totalSecondsLeft = 60 * 60;
+      timerStarted = false;
+      if (timerInterval) clearInterval(timerInterval);
+
+      document.getElementById("resultScreen").classList.add("hidden");
+      document.getElementById("registerScreen").classList.remove("hidden");
+      document.getElementById("studentName").value = "";
+      document.getElementById("studentId").value = "";
+      document.getElementById("timer").innerText = "Time: 60m 00s";
+    }
+  </script>
+</body>
+</html>
+```
